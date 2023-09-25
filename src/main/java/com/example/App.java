@@ -42,9 +42,52 @@ public class App extends JFrame {
 
         public CreateNewFileButton() {
             setTitle("Create New File");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(500, 500);
+        setLayout(new GridLayout(8, 2));
+
+        titleLabel = new JLabel("Title:");
+        dateLabel = new JLabel("Date: " + new Date().toString());
+        summaryLabel = new JLabel("Summary:");
+        ootdLabel = new JLabel("OOTD:");
+        drugsLabel = new JLabel("Drugs used:");
+        weatherLabel = new JLabel("Weather:");
+        achievementsLabel = new JLabel("Achievements:");
+
+        titleField = new JTextField();
+        summaryField = new JTextField();
+        ootdField = new JTextField();
+        drugsField = new JTextField();
+        weatherField = new JTextField();
+        achievementsField = new JTextField();
+
+        saveButton = new JButton("Save and Close");
+        closeButton = new JButton("Close without Saving");
+
+        saveButton.addActionListener(this);
+        closeButton.addActionListener(this);
+
+        add(titleLabel);
+        add(titleField);
+        add(dateLabel);
+        add(new JLabel(""));
+        add(summaryLabel);
+        add(summaryField);
+        add(ootdLabel);
+        add(ootdField);
+        add(drugsLabel);
+        add(drugsField);
+        add(weatherLabel);
+        add(weatherField);
+        add(achievementsLabel);
+        add(achievementsField);
+        add(saveButton);
+        add(closeButton);
+
+        setVisible(true);
         }
         public void actionPerformed(ActionEvent e) {
-            
+
         }
     }
 }
