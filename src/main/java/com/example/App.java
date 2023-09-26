@@ -25,6 +25,12 @@ public class App extends JFrame {
         createNewFileButton = new JButton("Create New File");
         openOldFileButton = new JButton("Open Old File");
 
+        createNewFileButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new CreateNewFileButton();
+            }
+        });
+
         add(createNewFileButton);
         add(openOldFileButton);
 
@@ -42,52 +48,79 @@ public class App extends JFrame {
 
         public CreateNewFileButton() {
             setTitle("Create New File");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(500, 500);
-        setLayout(new GridLayout(8, 2));
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            setSize(500, 500);
+            setLayout(new GridLayout(8, 2));
+            // Center the window on the screen
+            setLocationRelativeTo(null);
 
-        titleLabel = new JLabel("Title:");
-        dateLabel = new JLabel("Date: " + new Date().toString());
-        summaryLabel = new JLabel("Summary:");
-        ootdLabel = new JLabel("OOTD:");
-        drugsLabel = new JLabel("Drugs used:");
-        weatherLabel = new JLabel("Weather:");
-        achievementsLabel = new JLabel("Achievements:");
+            titleLabel = new JLabel("Title:");
+            dateLabel = new JLabel("Date: " + new Date().toString());
+            summaryLabel = new JLabel("Summary:");
+            ootdLabel = new JLabel("OOTD:");
+            drugsLabel = new JLabel("Drugs used:");
+            weatherLabel = new JLabel("Weather:");
+            achievementsLabel = new JLabel("Achievements:");
 
-        titleField = new JTextField();
-        summaryField = new JTextField();
-        ootdField = new JTextField();
-        drugsField = new JTextField();
-        weatherField = new JTextField();
-        achievementsField = new JTextField();
+            titleField = new JTextField();
+            summaryField = new JTextField();
+            ootdField = new JTextField();
+            drugsField = new JTextField();
+            weatherField = new JTextField();
+            achievementsField = new JTextField();
 
-        saveButton = new JButton("Save and Close");
-        closeButton = new JButton("Close without Saving");
+            saveButton = new JButton("Save and Close");
+            closeButton = new JButton("Close without Saving");
 
-        saveButton.addActionListener(this);
-        closeButton.addActionListener(this);
+            saveButton.addActionListener(this);
+            closeButton.addActionListener(this);
 
-        add(titleLabel);
-        add(titleField);
-        add(dateLabel);
-        add(new JLabel(""));
-        add(summaryLabel);
-        add(summaryField);
-        add(ootdLabel);
-        add(ootdField);
-        add(drugsLabel);
-        add(drugsField);
-        add(weatherLabel);
-        add(weatherField);
-        add(achievementsLabel);
-        add(achievementsField);
-        add(saveButton);
-        add(closeButton);
+            add(titleLabel);
+            add(titleField);
+            add(dateLabel);
+            add(new JLabel(""));
+            add(summaryLabel);
+            add(summaryField);
+            add(ootdLabel);
+            add(ootdField);
+            add(drugsLabel);
+            add(drugsField);
+            add(weatherLabel);
+            add(weatherField);
+            add(achievementsLabel);
+            add(achievementsField);
+            add(saveButton);
+            add(closeButton);
 
-        setVisible(true);
+            setVisible(true);
         }
-        public void actionPerformed(ActionEvent e) {
 
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == saveButton) {
+                try {
+
+                    String directory = System.getProperty("user.dir") + "\\journals\\";
+                    File journalsFolder = new File(directory + "journals");
+                    if (!journalsFolder.exists()) {
+                        journalsFolder.mkdir();
+                    }
+                    Document document = new Document();
+                    PdfWriter.getInstance(document, new FileOutputStream(titleField.getText() + ".pdf"));
+                    document.open();
+                    document.add(new Paragraph(dateLabel.getText()));
+                    document.add(new Paragraph("Summary: " + summaryField.getText()));
+                    document.add(new Paragraph("OOTD: " + ootdField.getText()));
+                    document.add(new Paragraph("Drugs used: " + drugsField.getText()));
+                    document.add(new Paragraph("Weather: " + weatherField.getText()));
+                    document.add(new Paragraph("Achievements: " + achievementsField.getText()));
+                    document.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                dispose();
+            } else if (e.getSource() == closeButton) {
+                dispose();
+            }
         }
     }
 }
