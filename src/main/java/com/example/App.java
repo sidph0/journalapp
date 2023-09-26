@@ -42,6 +42,7 @@ public class App extends JFrame {
     }
 
     class CreateNewFileButton extends JFrame implements ActionListener {
+        // Declare var gui components
         private JLabel titleLabel, dateLabel, summaryLabel, ootdLabel, drugsLabel, weatherLabel, achievementsLabel;
         private JTextField titleField, summaryField, ootdField, drugsField, weatherField, achievementsField;
         private JButton saveButton, closeButton;
@@ -54,6 +55,7 @@ public class App extends JFrame {
             // Center the window on the screen
             setLocationRelativeTo(null);
 
+            //initialize gui components
             titleLabel = new JLabel("Title:");
             dateLabel = new JLabel("Date: " + new Date().toString());
             summaryLabel = new JLabel("Summary:");
@@ -72,13 +74,15 @@ public class App extends JFrame {
             saveButton = new JButton("Save and Close");
             closeButton = new JButton("Close without Saving");
 
+            //action listeners for buttons
             saveButton.addActionListener(this);
             closeButton.addActionListener(this);
 
+            //add gui components to frame
             add(titleLabel);
             add(titleField);
             add(dateLabel);
-            add(new JLabel(""));
+            add(new JLabel("")); // empty label for space
             add(summaryLabel);
             add(summaryField);
             add(ootdLabel);
@@ -98,12 +102,13 @@ public class App extends JFrame {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == saveButton) {
                 try {
-
+                    // Set the directory to the project directory
                     String directory = System.getProperty("user.dir") + "\\journals\\";
                     File journalsFolder = new File(directory + "journals");
                     if (!journalsFolder.exists()) {
                         journalsFolder.mkdir();
                     }
+                    // Create a new PDF document and save it in the journals folder
                     Document document = new Document();
                     PdfWriter.getInstance(document, new FileOutputStream(titleField.getText() + ".pdf"));
                     document.open();
