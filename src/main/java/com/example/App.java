@@ -1,5 +1,21 @@
 package com.example;
+
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
+
+import org.jdatepicker.JDatePanel;
+import org.jdatepicker.JDatePicker;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilCalendarModel;
+import org.jdatepicker.impl.UtilDateModel;
+import org.xml.sax.SAXException;
+import org.jdatepicker.JDatePanel;
+import org.jdatepicker.JDatePicker;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -7,9 +23,11 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
@@ -17,7 +35,7 @@ import com.toedter.calendar.JCalendar;
 
 public class App extends JFrame implements ActionListener {
     private String selectedDate;
-    private JTextArea summary, ootd, drugs, weather, wake, eats, sweets, album, achievements;
+    private JTextArea summary, ootd, drugs, weather, wake, eats, sweets, album, journal, achievements;
 
     public App() {
         final File journalsFolder = new File("C:\\Users\\Sid-Gaming\\Desktop\\docsclone\\docsclone");
@@ -25,11 +43,12 @@ public class App extends JFrame implements ActionListener {
             journalsFolder.mkdirs();
         }
         // Create GUI with calendar and buttons
-        
+
         JPanel calendarPanel = new JPanel(new BorderLayout());
         final JCalendar calendar = new JCalendar();
         calendar.setBackground(Color.BLACK);
         calendarPanel.add(calendar, BorderLayout.CENTER);
+        calendarPanel.setBackground(Color.black);
         JButton newJournalButton = new JButton("Create new Journal");
         final JButton viewEditButton = new JButton("View/Edit an Entry");
         JButton newButton = new JButton("New");
@@ -61,16 +80,17 @@ public class App extends JFrame implements ActionListener {
                     final JTextArea eatsField = new JTextArea(5, 20);
                     final JTextArea sweetsField = new JTextArea(5, 20);
                     final JTextArea albumField = new JTextArea(5, 20);
+                    final JTextArea journalField = new JTextArea(5, 20);
                     final JTextArea achievementsField = new JTextArea(5, 20);
                     final JButton saveButton = new JButton("Save");
                     JButton bulletButton = new JButton("•");
                     bulletButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             // Get the current cursor position in the text area
-                            int position = summaryField.getCaretPosition();
+                            int position = journalField.getCaretPosition();
 
                             // Insert a bullet point at the current cursor position
-                            summaryField.insert("• ", position);
+                            journalField.insert("• ", position);
                         }
                     });
                     // Add the tab key listener to the summary field
@@ -86,18 +106,17 @@ public class App extends JFrame implements ActionListener {
                                     spaces.append(" ");
                                 }
                                 summaryField.insert(spaces.toString(), position);
-                                
 
                                 // Consume the tab key event to prevent default behavior
                                 e.consume();
-                            
+
                             }
                         }
                     });
 
                     // Add the bullet point button to the form panel
 
-                    JPanel form = new JPanel(new GridLayout(11, 1));
+                    JPanel form = new JPanel(new GridLayout(12, 1));
                     form.add(new JLabel("Date:\n"));
                     form.add(new JLabel(formattedDate));
                     form.add(new JLabel("Summary:"));
@@ -116,6 +135,8 @@ public class App extends JFrame implements ActionListener {
                     form.add(new JScrollPane(sweetsField));
                     form.add(new JLabel("Album of the day:"));
                     form.add(new JScrollPane(albumField));
+                    form.add(new JLabel("Main Journal: "));
+                    form.add(new JScrollPane(journalField));
                     form.add(new JLabel("Achievements:"));
                     form.add(new JScrollPane(achievementsField));
                     form.add(saveButton);
@@ -125,7 +146,13 @@ public class App extends JFrame implements ActionListener {
                             if (e.getSource() == saveButton) {
                                 // Save the journal entry to a PDF file
                                 try {
-                                    Font font = new Font(Font.SERIF, Font.PLAIN, 13);
+                                    // Create a new font with bold and bigger size
+                                    com.itextpdf.text.Font summaryFont = new com.itextpdf.text.Font(
+                                            com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, 14,
+                                            com.itextpdf.text.Font.BOLD);
+
+                                    Phrase summaryPhrase = new Phrase("Summary:");
+                                    Phrase summaryTextPhrase = new Phrase(summaryField.getText(), summaryFont);
                                     // Create a new PDF document
                                     Document document = new Document();
                                     String fileName = "Journal Entry " + formattedDate + ".pdf";
@@ -134,7 +161,9 @@ public class App extends JFrame implements ActionListener {
 
                                     // Add the user input to the PDF document
                                     document.add(new Paragraph("Date: " + formattedDate));
-                                    document.add(new Paragraph("Summary: " + summaryField.getText()));
+                                    document.add(summaryPhrase);
+                                    document.add(summaryTextPhrase);
+                                    // document.add(new Paragraph("Summary: " + summaryField.getText()));
                                     document.add(new Paragraph("OOTD: " + ootdField.getText()));
                                     document.add(new Paragraph("Drugs used: " + drugsField.getText()));
                                     document.add(new Paragraph("Weather: " + weatherField.getText()));
@@ -142,6 +171,7 @@ public class App extends JFrame implements ActionListener {
                                     document.add(new Paragraph("Eats: " + eatsField.getText()));
                                     document.add(new Paragraph("Sweets: " + sweetsField.getText()));
                                     document.add(new Paragraph("Album of the day: " + albumField.getText()));
+                                    document.add(new Paragraph("Main Journal: " + journalField.getText()));
                                     document.add(new Paragraph("Achievements: " + achievementsField.getText()));
 
                                     // Close the PDF document
@@ -176,6 +206,7 @@ public class App extends JFrame implements ActionListener {
         eats = new JTextArea();
         sweets = new JTextArea();
         album = new JTextArea();
+        journal = new JTextArea();
         achievements = new JTextArea();
 
         // When the user clicks on a date in the calendar, display the summary of the
@@ -207,6 +238,8 @@ public class App extends JFrame implements ActionListener {
                                 sweets.setText(line.substring(8));
                             } else if (line.startsWith("Album of the day:")) {
                                 album.setText(line.substring(17));
+                            } else if (line.startsWith("Journal:")) {
+                                journal.setText(line.substring(9));
                             } else if (line.startsWith("Achievements:")) {
                                 achievements.setText(line.substring(14));
                             }
@@ -224,6 +257,7 @@ public class App extends JFrame implements ActionListener {
                     eats.setText("");
                     sweets.setText("");
                     album.setText("");
+                    journal.setText("");
                     achievements.setText("");
                 }
             }
